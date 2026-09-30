@@ -10,6 +10,7 @@ import { configurePassport } from './config/passport.js';
 
 import authRoutes from './routes/auth.routes.js';
 import userRouter from './routes/user.routes.js';
+import { swaggerDocsRouter } from './docs/swagger.js';
 
 import { errorHandler } from './middleware/error-handler.js';
 
@@ -18,7 +19,12 @@ import { env } from './config/env.js';
 const app = express();
 
 // Apply security-related HTTP headers before handling application requests.
-app.use(helmet());
+// Disable default CSP so Swagger UI assets and interactive console can run in browser.
+app.use(
+  helmet({
+    contentSecurityPolicy: false,
+  }),
+);
 
 // Allow the configured frontend to make credentialed cross-origin requests.
 // Credentials are required because authentication tokens are stored in cookies.
@@ -37,6 +43,9 @@ app.use(cookieParser());
 
 configurePassport();
 app.use(passport.initialize());
+
+// Swagger / OpenAPI documentation UI & JSON spec
+app.use('/api-docs', swaggerDocsRouter);
 
 app.use('/auth', authRoutes);
 app.use('/users', userRouter);

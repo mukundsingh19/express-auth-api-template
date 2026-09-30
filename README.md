@@ -51,6 +51,8 @@ The template is intentionally modular: authentication, sessions, OAuth, validati
 
 - **100% TypeScript** with strict type checking (`strict: true`)
 - **NodeNext Module Resolution** (`module: "NodeNext"`, `moduleResolution: "NodeNext"`) with native ES Modules
+- **Interactive Swagger / OpenAPI 3.0 UI** at `/api-docs` with direct "Try it out" testing
+- **Standardized API Development Guidelines** (`API_DEVELOPMENT_GUIDELINES.md`)
 - **Fast Development Workflow** powered by `tsx` hot reloading
 - Complete type definitions for Express requests, middleware, services, and database models
 - **Prisma ORM** with PostgreSQL
@@ -670,6 +672,44 @@ Run full validation:
 ```bash
 npm run check
 ```
+
+---
+
+# Swagger / OpenAPI Documentation
+
+This template includes a complete, modular **OpenAPI 3.0** specification with an interactive **Swagger UI** for testing APIs directly against the running backend.
+
+### Endpoints
+
+- **Swagger UI**: `http://localhost:<PORT>/api-docs` (e.g., `http://localhost:3000/api-docs` or `http://localhost:5000/api-docs`)
+- **OpenAPI JSON Spec**: `http://localhost:<PORT>/api-docs/json`
+
+### Testing Authenticated Endpoints via Swagger UI
+
+The backend uses secure HTTP-only cookies (`accessToken`, `refreshToken`, `oauthState`) for session management.
+
+Swagger UI is configured with `withCredentials: true`, enabling seamless cookie handling:
+
+1. Open `http://localhost:<PORT>/api-docs` in your browser.
+2. Expand `POST /auth/login` and click **"Try it out"**.
+3. Enter valid verified credentials and click **"Execute"**. The response sets the `accessToken` and `refreshToken` cookies in your browser.
+4. Now expand any protected endpoint (such as `GET /auth/me` or `PATCH /users/me`) and click **"Execute"**. The browser automatically passes the authentication cookies.
+
+---
+
+# API Development Guidelines
+
+For all new API endpoints and modifications, please refer to:
+
+👉 **[API_DEVELOPMENT_GUIDELINES.md](file:///d:/Suretek-Builds/express-auth-api-template/API_DEVELOPMENT_GUIDELINES.md)**
+
+This document defines:
+
+- **Layered Architecture & Flow**: `Route` ➔ `Validation` ➔ `Auth` ➔ `Controller` ➔ `Service` ➔ `Prisma` ➔ `Error Handler`
+- **Directory Structure & Placement Rules**: Exact locations for schemas, controllers, services, routes, and OpenAPI definitions.
+- **Swagger / OpenAPI Documentation Requirements**: How to document requests, responses, status codes, and security schemes without documentation drift.
+- **Automated Testing Standards**: Expectations for unit, integration, validation, and error test cases.
+- **New API Checklist & Definition of Done**: Comprehensive pre-flight checklist before submitting code.
 
 ---
 
