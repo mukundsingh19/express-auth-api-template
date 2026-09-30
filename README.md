@@ -1,10 +1,10 @@
 # Express Auth API Template
 
-A production-oriented, reusable authentication and user-management REST API built with **Express**, **PostgreSQL**, **Prisma**, **Passport**, **JWT**, **Zod**, and secure HTTP-only cookies.
+A production-oriented, fully type-safe, reusable authentication and user-management REST API built with **TypeScript**, **Express**, **PostgreSQL**, **Prisma**, **Passport**, **JWT**, **Zod**, and secure HTTP-only cookies.
 
-This project is designed to be used as a **starting point for future web applications**. It provides the authentication and account-management foundation so application-specific features can be built on top of it without repeatedly rebuilding authentication infrastructure.
+This project is designed to be used as a **starting point for future web applications**. It provides the complete authentication and account-management foundation so application-specific features can be built on top of it without repeatedly rebuilding authentication infrastructure.
 
-The template is intentionally modular: authentication, sessions, OAuth, validation, email workflows, and user management are separated into focused modules that can be reused or extended as needed.
+The template is intentionally modular: authentication, sessions, OAuth, validation, email workflows, and user management are separated into focused, strictly typed modules that can be reused or extended as needed.
 
 ---
 
@@ -13,94 +13,53 @@ The template is intentionally modular: authentication, sessions, OAuth, validati
 ### Authentication
 
 - Local email/password authentication
-
 - Google OAuth 2.0
-
 - GitHub OAuth
-
 - JWT access tokens
-
 - JWT refresh tokens
-
 - HTTP-only authentication cookies
-
 - Refresh-token rotation
-
 - Server-side session tracking
-
 - Session revocation
-
 - Authentication middleware
-
 - Secure logout
-
 - Password changes
-
 - Password reset flow
-
 - Email verification
-
 - Email address change verification
-
 - Account deletion
 
 ### Security
 
 - Password hashing with `bcryptjs`
-
 - Separate access-token and refresh-token secrets
-
 - Refresh-token hashes stored in the database instead of raw tokens
-
 - Refresh-token rotation and reuse detection
-
 - Session revocation after password changes and password resets
-
 - Cryptographically secure verification codes and tokens
-
 - OAuth state validation using `crypto.timingSafeEqual`
-
 - Rate limiting on authentication-sensitive endpoints
-
-- Zod request validation
-
+- Zod request validation and type inference
 - Helmet security headers
-
 - Credentialed CORS restricted to the configured frontend origin
-
 - Centralized error handling
-
 - Prisma database constraints as the final protection against race conditions
-
 - Generic authentication errors that avoid unnecessarily exposing account information
-
 - Secure cookie configuration for production environments
 
-### Developer Experience
+### Developer Experience & TypeScript
 
-- ES modules
-
-- Prisma ORM
-
-- PostgreSQL
-
-- Vitest
-
-- Supertest
-
-- ESLint
-
-- Prettier
-
-- Environment validation with Zod
-
-- Modular service/controller architecture
-
-- Reusable authentication foundation
-
-- Comprehensive automated test suite
-
-Optional email infrastructure
+- **100% TypeScript** with strict type checking (`strict: true`)
+- **NodeNext Module Resolution** (`module: "NodeNext"`, `moduleResolution: "NodeNext"`) with native ES Modules
+- **Fast Development Workflow** powered by `tsx` hot reloading
+- Complete type definitions for Express requests, middleware, services, and database models
+- **Prisma ORM** with PostgreSQL
+- **Vitest & Supertest** automated testing suite
+- **ESLint & Prettier** code quality and formatting
+- Environment variable validation and typing with Zod
+- Clean layered architecture (Routes -> Middleware -> Controllers -> Services -> Persistence)
+- Declarations and source maps generated on build (`dist/`)
+- Optional email infrastructure with Resend
 
 ---
 
@@ -110,38 +69,24 @@ Authentication is infrastructure.
 
 It is something almost every full-stack application needs, but it is also an area where small implementation mistakes can create serious security problems.
 
-Instead of rebuilding registration, login, sessions, password resets, email verification, OAuth, rate limiting, and account management for every application, this project provides a reusable foundation.
+Instead of rebuilding registration, login, sessions, password resets, email verification, OAuth, rate limiting, and account management for every application, this project provides a robust, type-safe reusable foundation.
 
 The intended workflow is:
 
 ```text
-
-                 Express Auth API
-
-                       │
-
-        ┌──────────────┼──────────────┐
-
-        │              │              │
-
-   Authentication   User Accounts   Sessions
-
-        │              │              │
-
-        └──────────────┼──────────────┘
-
-                       │
-
-                Your Application
-
-                       │
-
-        ┌──────────────┼──────────────┐
-
-        │              │              │
-
-     Posts          Messages        Projects
-
+                 Express Auth API (TypeScript)
+                               │
+        ┌──────────────────────┼──────────────────────┐
+        │                      │                      │
+  Authentication         User Accounts             Sessions
+        │                      │                      │
+        └──────────────────────┼──────────────────────┘
+                               │
+                        Your Application
+                               │
+        ┌──────────────────────┼──────────────────────┐
+        │                      │                      │
+      Posts                 Messages               Projects
 ```
 
 Application-specific functionality should be built **on top of** the authentication layer rather than tightly coupling business logic to it.
@@ -149,33 +94,20 @@ Application-specific functionality should be built **on top of** the authenticat
 For example, a future application could add:
 
 ```text
-
 src/
-
 ├── controllers/
-
-│   ├── auth.controller.js
-
-│   ├── oauth.controller.js
-
-│   └── user.controller.js
-
+│   ├── auth.controller.ts
+│   ├── oauth.controller.ts
+│   ├── user.controller.ts
+│   └── post.controller.ts
 │
-
 ├── services/
-
-│   ├── auth.service.js
-
-│   ├── session.service.js
-
-│   ├── user.service.js
-
-│   └── ...
-
+│   ├── auth.service.ts
+│   ├── session.service.ts
+│   ├── user.service.ts
+│   └── post.service.ts
 │
-
 └── ...
-
 ```
 
 and then introduce its own application-specific modules without having to redesign authentication.
@@ -187,84 +119,87 @@ and then introduce its own application-specific modules without having to redesi
 The API follows a layered architecture:
 
 ```text
-
 HTTP Request
-
-     │
-
-     ▼
-
-   Routes
-
-     │
-
-     ▼
-
- Middleware
-
- ├── Rate limiting
-
- ├── Authentication
-
- ├── Validation
-
- └── Passport
-
-     │
-
-     ▼
-
- Controllers
-
-     │
-
-     ▼
-
- Services
-
-     │
-
-     ▼
-
- Prisma
-
-     │
-
-     ▼
-
- PostgreSQL
-
+     │
+     ▼
+   Routes
+     │
+     ▼
+ Middleware
+ ├── Rate limiting
+ ├── Authentication
+ ├── Validation
+ └── Passport
+     │
+     ▼
+Controllers
+     │
+     ▼
+ Services
+     │
+     ▼
+  Prisma
+     │
+     ▼
+PostgreSQL
 ```
 
 ### Responsibilities
 
-| Layer          | Responsibility                                                  |
-
-| -------------- | --------------------------------------------------------------- |
-
-| `routes/`      | Defines HTTP endpoints and middleware composition               |
-
-| `middleware/`  | Authentication, validation, rate limiting, error handling       |
-
-| `controllers/` | Handles HTTP requests and responses                             |
-
-| `services/`    | Contains application and authentication business logic          |
-
-| `strategies/`  | Passport authentication strategies and OAuth profile processing |
-
-| `schemas/`     | Zod request validation schemas                                  |
-
-| `config/`      | Environment, cookies, and Passport configuration                |
-
-| `db/`          | Prisma client/database configuration                            |
-
-| `emails/`      | Email content/templates                                         |
-
-| `errors/`      | Application-specific error types                                |
-
-| `utils/`       | Small reusable utility functions                                |
+| Layer              | Responsibility                                                  |
+| ------------------ | --------------------------------------------------------------- |
+| `src/routes/`      | Defines HTTP endpoints and middleware composition               |
+| `src/middleware/`  | Authentication, validation, rate limiting, error handling       |
+| `src/controllers/` | Handles HTTP requests and responses                             |
+| `src/services/`    | Contains application and authentication business logic          |
+| `src/strategies/`  | Passport authentication strategies and OAuth profile processing |
+| `src/schemas/`     | Zod request validation schemas and inferred types               |
+| `src/config/`      | Environment, cookies, and Passport configuration                |
+| `src/db/`          | Prisma client and database adapter initialization               |
+| `src/emails/`      | Email content and template generators                           |
+| `src/errors/`      | Application-specific error classes (`AppError`)                 |
+| `src/types/`       | TypeScript declaration augmentations and shared types           |
+| `src/utils/`       | Reusable utility functions                                      |
 
 The goal is to keep HTTP concerns, authentication logic, persistence, and reusable utilities from becoming unnecessarily intertwined.
+
+---
+
+# TypeScript Configuration
+
+The project is configured with modern, strict TypeScript settings using the NodeNext module system:
+
+```json
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "lib": ["ES2022"],
+    "outDir": "./dist",
+    "rootDir": ".",
+    "strict": true,
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "skipLibCheck": true,
+    "resolveJsonModule": true,
+    "declaration": true,
+    "declarationMap": true,
+    "sourceMap": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noFallthroughCasesInSwitch": true
+  },
+  "include": ["src/**/*", "generated/**/*"],
+  "exclude": ["node_modules", "dist"]
+}
+```
+
+### Key TypeScript Rules
+
+1. **Relative Imports with `.js` Extension**: Because NodeNext preserves native ESM semantics, relative imports in TypeScript source files specify `.js` extensions (e.g. `import { env } from '../config/env.js';`). TypeScript resolves them to corresponding `.ts` source files during type-checking and compilation.
+2. **Strict Mode Enabled**: Full strict checking (`strict: true`, `noUnusedLocals: true`, `noUnusedParameters: true`) ensures no implicit `any` types and complete null safety.
+3. **Build Artifacts**: Compiling with `npm run build` generates clean JavaScript in `./dist` along with `.d.ts` type declarations, declaration maps, and source maps.
 
 ---
 
@@ -275,87 +210,49 @@ The goal is to keep HTTP concerns, authentication logic, persistence, and reusab
 The local login flow is:
 
 ```text
-
 POST /auth/login
-
-       │
-
-       ▼
-
+       │
+       ▼
 Request validation
-
-       │
-
-       ▼
-
+       │
+       ▼
 Rate limiter
-
-       │
-
-       ▼
-
+       │
+       ▼
 Passport Local Strategy
-
-       │
-
-       ├── Find user
-
-       ├── Verify password
-
-       └── Verify email
-
-       │
-
-       ▼
-
+       │
+       ├── Find user
+       ├── Verify password
+       └── Verify email
+       │
+       ▼
 Create session
-
-       │
-
-       ├── Generate access token
-
-       └── Generate refresh token
-
-       │
-
-       ▼
-
+       │
+       ├── Generate access token
+       └── Generate refresh token
+       │
+       ▼
 HTTP-only cookies
-
 ```
 
-The API does not return authentication tokens in the JSON response.
-
-Instead, tokens are stored in HTTP-only cookies.
+The API does not return authentication tokens in the JSON response. Instead, tokens are stored in HTTP-only cookies.
 
 ---
 
 ## Access Tokens
 
-Access tokens are short-lived JWTs containing the authenticated user's identifier.
-
-They are used to authenticate normal API requests.
+Access tokens are short-lived JWTs containing the authenticated user's identifier. They are used to authenticate normal API requests.
 
 ```text
-
 Client
-
-  │
-
-  │ accessToken cookie
-
-  ▼
-
+  │
+  │ accessToken cookie
+  ▼
 authenticate middleware
-
-  │
-
-  ├── Verify JWT
-
-  ├── Find user
-
-  └── Attach user to req.user
-
+  │
+  ├── Verify JWT
+  ├── Find user in database
+  └── Attach user to req.user
 ```
 
 ---
@@ -369,52 +266,29 @@ The database stores a SHA-256 hash of the refresh token rather than the raw toke
 A refresh request:
 
 ```text
-
 Refresh Token
-
-      │
-
-      ▼
-
+      │
+      ▼
 Verify JWT
-
-      │
-
-      ▼
-
+      │
+      ▼
 Find Session
-
-      │
-
-      ▼
-
+      │
+      ▼
 Compare Token Hash
-
-      │
-
-      ▼
-
+      │
+      ▼
 Rotate Token
-
-      │
-
-      ├── Replace stored hash
-
-      ├── Update lastUsedAt
-
-      └── Extend expiration
-
-      │
-
-      ▼
-
+      │
+      ├── Replace stored hash
+      ├── Update lastUsedAt
+      └── Extend expiration
+      │
+      ▼
 Issue New Access + Refresh Tokens
-
 ```
 
-If a previously rotated refresh token is reused, the session is revoked.
-
-This gives the application server-side control over otherwise stateless JWT refresh credentials.
+If a previously rotated refresh token is reused, the session is revoked. This gives the application server-side control over otherwise stateless JWT refresh credentials.
 
 ---
 
@@ -425,49 +299,27 @@ Google and GitHub authentication are implemented through Passport.
 The flow is intentionally separated into multiple stages:
 
 ```text
-
 OAuth Provider
-
-      │
-
-      ▼
-
+      │
+      ▼
 Passport Strategy
-
-      │
-
-      ▼
-
+      │
+      ▼
 Provider Profile Processor
-
-      │
-
-      ▼
-
+      │
+      ▼
 OAuth Service
-
-      │
-
-      ├── Find existing account
-
-      ├── Find existing user
-
-      ├── Generate username
-
-      └── Create user + account
-
-      │
-
-      ▼
-
+      │
+      ├── Find existing account
+      ├── Find existing user
+      ├── Generate username
+      └── Create user + account
+      │
+      ▼
 Create Authentication Session
-
-      │
-
-      ▼
-
+      │
+      ▼
 HTTP-only Cookies
-
 ```
 
 Provider-specific profile processing is kept separate from database operations so additional OAuth providers can be added without placing provider-specific logic inside the core OAuth service.
@@ -479,171 +331,86 @@ Google and GitHub are optional. The application only configures a provider when 
 # Project Structure
 
 ```text
-
-server/
-
+express-auth-api-template/
+├── dist/                          # Compiled production output
 ├── generated/
-
-│   └── prisma/
-
-│
-
+│   └── prisma/                    # Generated Prisma client and models
 ├── prisma/
-
-│   └── schema.prisma
-
-│
-
+│   ├── migrations/                # Database migrations
+│   └── schema.prisma              # Prisma schema definition
 ├── src/
-
-│   ├── config/
-
-│   │   ├── cookies.js
-
-│   │   ├── env.js
-
-│   │   └── passport.js
-
-│   │
-
-│   ├── controllers/
-
-│   │   ├── auth.controller.js
-
-│   │   ├── oauth.controller.js
-
-│   │   └── user.controller.js
-
-│   │
-
-│   ├── db/
-
-│   │   └── prisma.js
-
-│   │
-
-│   ├── emails/
-
-│   │   ├── email-change.js
-
-│   │   ├── email-verification.js
-
-│   │   └── password-reset.js
-
-│   │
-
-│   ├── errors/
-
-│   │   └── AppError.js
-
-│   │
-
-│   ├── middleware/
-
-│   │   ├── authenticate.js
-
-│   │   ├── error-handler.js
-
-│   │   ├── passport.js
-
-│   │   ├── rate-limit.js
-
-│   │   └── validate.js
-
-│   │
-
-│   ├── routes/
-
-│   │   ├── auth.routes.js
-
-│   │   └── user.routes.js
-
-│   │
-
-│   ├── schemas/
-
-│   │   ├── auth.schema.js
-
-│   │   ├── common.schema.js
-
-│   │   └── user.schema.js
-
-│   │
-
-│   ├── services/
-
-│   │   ├── auth.service.js
-
-│   │   ├── email-change.service.js
-
-│   │   ├── email-verification.service.js
-
-│   │   ├── email.service.js
-
-│   │   ├── oauth.service.js
-
-│   │   ├── oauth.state.service.js
-
-│   │   ├── password-reset.service.js
-
-│   │   ├── password.service.js
-
-│   │   ├── session.service.js
-
-│   │   ├── token.service.js
-
-│   │   ├── user.service.js
-
-│   │   └── verification-token.service.js
-
-│   │
-
-│   ├── strategies/
-
-│   │   ├── github-profile.js
-
-│   │   ├── github.strategy.js
-
-│   │   ├── google-profile.js
-
-│   │   ├── google.strategy.js
-
-│   │   └── local.strategy.js
-
-│   │
-
-│   ├── utils/
-
-│   │   └── duration.js
-
-│   │
-
-│   ├── app.js
-
-│   └── server.js
-
-│
-
+│   ├── config/
+│   │   ├── cookies.ts             # Cookie configurations
+│   │   ├── env.ts                 # Validated environment configuration
+│   │   └── passport.ts            # Passport initialization
+│   ├── controllers/
+│   │   ├── auth.controller.ts     # Authentication HTTP handlers
+│   │   ├── oauth.controller.ts    # OAuth flow handlers
+│   │   └── user.controller.ts     # User profile and account handlers
+│   ├── db/
+│   │   └── prisma.ts              # Prisma client instance & pg adapter
+│   ├── emails/
+│   │   ├── email-change.ts        # Email change email template
+│   │   ├── email-verification.ts  # Verification code email template
+│   │   └── password-reset.ts      # Password reset email template
+│   ├── errors/
+│   │   └── AppError.ts            # Custom operational error class
+│   ├── middleware/
+│   │   ├── authenticate.ts        # JWT cookie authentication middleware
+│   │   ├── error-handler.ts       # Centralized error handler
+│   │   ├── passport.ts            # Passport local authentication middleware
+│   │   ├── rate-limit.ts          # Endpoint-specific rate limiters
+│   │   └── validate.ts            # Zod validation middleware
+│   ├── routes/
+│   │   ├── auth.routes.ts         # Authentication routes
+│   │   └── user.routes.ts         # User account management routes
+│   ├── schemas/
+│   │   ├── auth.schema.ts         # Auth request validation schemas
+│   │   ├── common.schema.ts       # Shared validation rules
+│   │   └── user.schema.ts         # User request validation schemas
+│   ├── services/
+│   │   ├── auth.service.ts        # Auth registration & session creation
+│   │   ├── email-change.service.ts # Email change business logic
+│   │   ├── email-verification.service.ts # Verification email logic
+│   │   ├── email.service.ts       # Resend email delivery service
+│   │   ├── oauth.service.ts       # OAuth user lookup and creation
+│   │   ├── oauth.state.service.ts # OAuth state generation and validation
+│   │   ├── password-reset.service.ts # Password reset business logic
+│   │   ├── password.service.ts    # Bcrypt password hashing & verification
+│   │   ├── session.service.ts     # Session lifecycle, rotation & revocation
+│   │   ├── token.service.ts       # JWT access/refresh token operations
+│   │   ├── user.service.ts        # User database operations
+│   │   └── verification-token.service.ts # OTP & token generation/verification
+│   ├── strategies/
+│   │   ├── github-profile.ts      # GitHub profile parser & normalizer
+│   │   ├── github.strategy.ts     # Passport GitHub OAuth strategy
+│   │   ├── google-profile.ts      # Google profile parser & normalizer
+│   │   ├── google.strategy.ts     # Passport Google OAuth strategy
+│   │   └── local.strategy.ts      # Passport local username/password strategy
+│   ├── types/
+│   │   ├── express.d.ts           # Express Request & User type augmentations
+│   │   └── index.ts               # Shared interfaces and type definitions
+│   ├── utils/
+│   │   └── duration.ts            # Duration parser helper (e.g., "15m", "7d")
+│   ├── app.ts                     # Express app setup and middleware chain
+│   └── server.ts                  # HTTP server entry point
 ├── tests/
-
-│   ├── auth/
-
-│   ├── strategies/
-
-│   ├── users/
-
-│   └── setup.js
-
-│
-
-├── .env.example
-
-├── .gitignore
-
-├── package.json
-
+│   ├── auth/                      # Authentication integration tests
+│   ├── configuration/             # Feature flag configuration tests
+│   ├── controllers/               # Controller unit tests
+│   ├── emails/                    # Email template unit tests
+│   ├── services/                  # Service unit tests
+│   ├── strategies/                # Strategy and parser unit tests
+│   ├── users/                     # User management integration tests
+│   └── setup.js                   # Vitest setup & teardown
+├── .env.example                   # Environment variable template
+├── .env.test                      # Test environment configuration
+├── eslint.config.js               # ESLint configuration (TypeScript + Prettier)
+├── package.json                   # Project dependencies and scripts
+├── prisma.config.ts               # Prisma CLI configuration
+├── tsconfig.json                  # TypeScript compiler configuration
+├── vitest.config.js               # Vitest test runner configuration
 └── README.md
-
 ```
 
 ---
@@ -652,133 +419,140 @@ server/
 
 Before starting, make sure you have:
 
-- Node.js
-
-- npm
-
-- PostgreSQL
-
-- A PostgreSQL database for the application
-
-- A PostgreSQL database for tests
+- **Node.js** (v20.x or higher recommended)
+- **npm** (v10.x or higher)
+- **PostgreSQL** database instance
 
 Optional:
 
 - Google OAuth credentials
-
 - GitHub OAuth credentials
-
-- Resend account/API key
+- Resend API key (for email verification and password reset)
 
 ---
 
-# Installation
+# Installation & Setup
 
-Clone the repository:
+### 1. Clone the template
 
 ```bash
-
-git clone https://github.com/JavedanCode/express-auth-api-template.git
-
+git clone https://github.com/mukundsingh19/express-auth-api-template.git my-new-project
+cd my-new-project
 ```
 
-Enter the project:
+### 2. Install dependencies
 
 ```bash
-
-cd express-auth-api-template
-
-```
-
-Install dependencies:
-
-```bash
-
 npm install
-
 ```
+
+### 3. Configure the environment
+
+Create your local environment file:
+
+```bash
+cp .env.example .env
+```
+
+Configure the required environment variables in `.env`.
+
+### 4. Setup the Database
+
+Generate the Prisma client:
+
+```bash
+npm run db:generate
+```
+
+Run database migrations:
+
+```bash
+npm run db:migrate
+```
+
+---
+
+# Available NPM Scripts
+
+The following scripts are configured in `package.json`:
+
+| Script                      | Command                                                                 | Description                                              |
+| --------------------------- | ----------------------------------------------------------------------- | -------------------------------------------------------- |
+| `npm run dev`               | `tsx watch src/server.ts`                                               | Start the development server with live TypeScript reload |
+| `npm run build`             | `tsc`                                                                   | Compile TypeScript source files to the `./dist` folder   |
+| `npm start`                 | `node dist/src/server.js`                                               | Run the compiled production server                       |
+| `npm run typecheck`         | `tsc --noEmit`                                                          | Run static type checking without emitting files          |
+| `npm test`                  | `vitest run`                                                            | Run the automated test suite                             |
+| `npm run test:watch`        | `vitest`                                                                | Run tests in interactive watch mode                      |
+| `npm run lint`              | `eslint .`                                                              | Lint all JavaScript and TypeScript files                 |
+| `npm run lint:fix`          | `eslint . --fix`                                                        | Automatically fix linting issues                         |
+| `npm run format`            | `prettier --write .`                                                    | Format all files using Prettier                          |
+| `npm run format:check`      | `prettier --check .`                                                    | Verify formatting without modifying files                |
+| `npm run db:generate`       | `prisma generate`                                                       | Generate the Prisma Client to `generated/prisma`         |
+| `npm run db:migrate`        | `prisma migrate dev`                                                    | Apply migrations in development                          |
+| `npm run db:migrate:deploy` | `prisma migrate deploy`                                                 | Apply pending migrations in production                   |
+| `npm run db:studio`         | `prisma studio`                                                         | Open Prisma Studio database GUI                          |
+| `npm run check`             | `npm run typecheck && npm run lint && npm run format:check && npm test` | Run full validation pipeline                             |
 
 ---
 
 # Environment Configuration
 
-Create your local environment file from the provided example:
-
-```text
-
-.env.example
-
-```
-
-Copy it to:
-
-```text
-
-.env
-
-```
-
-Then configure the required values.
-
-The repository intentionally does **not** include real credentials.
+Create your local environment file from `.env.example`.
 
 ## Required Variables
 
 ```env
-
 NODE_ENV=development
-
 PORT=3000
-
 DATABASE_URL="postgresql://USERNAME:PASSWORD@HOST:5432/DATABASE_NAME"
 
 CLIENT_URL="http://localhost:5173"
+CLIENT_ORIGIN="http://localhost:5173"
 
-JWT_ACCESS_SECRET="your-access-token-secret"
+JWT_ACCESS_SECRET="your-access-token-secret-must-be-at-least-32-characters-long"
+JWT_REFRESH_SECRET="your-refresh-token-secret-must-be-at-least-32-characters-long"
+JWT_ACCESS_EXPIRES_IN="15m"
+JWT_REFRESH_EXPIRES_IN="7d"
 
-JWT_REFRESH_SECRET="your-refresh-token-secret"
-
-RESEND_API_KEY="your-resend-api-key"
-
-EMAIL_FROM="your-sender@example.com"
-
-PASSWORD_RESET_URL="http://localhost:5173/reset-password"
-
-EMAIL_CHANGE_URL="http://localhost:5173/change-email"
-
+EMAIL_ENABLED=false
 ```
 
-JWT secrets should be long, unpredictable values and should be different from one another.
+JWT secrets should be long, unpredictable values (minimum 32 characters) and should be different from one another.
 
-## OAuth Variables
+## Email Configuration (Optional)
 
-Google and GitHub authentication are optional.
+When `EMAIL_ENABLED=true`, the following variables are required:
+
+```env
+EMAIL_ENABLED=true
+RESEND_API_KEY="your-resend-api-key"
+EMAIL_FROM="your-sender@example.com"
+PASSWORD_RESET_URL="http://localhost:5173/reset-password"
+EMAIL_CHANGE_URL="http://localhost:5173/change-email"
+```
+
+## OAuth Variables (Optional)
+
+Google and GitHub authentication are optional:
 
 ### Google
 
 ```env
-
-GOOGLE_CLIENT_ID=""
-
-GOOGLE_CLIENT_SECRET=""
-
+GOOGLE_CLIENT_ID="your-google-client-id"
+GOOGLE_CLIENT_SECRET="your-google-client-secret"
 GOOGLE_CALLBACK_URL="http://localhost:3000/auth/google/callback"
-
 ```
 
 ### GitHub
 
 ```env
-
-GITHUB_CLIENT_ID=""
-
-GITHUB_CLIENT_SECRET=""
-
+GITHUB_CLIENT_ID="your-github-client-id"
+GITHUB_CLIENT_SECRET="your-github-client-secret"
 GITHUB_CALLBACK_URL="http://localhost:3000/auth/github/callback"
-
 ```
 
-If a provider is not configured, its Passport strategy is simply not registered.
+If a provider is not configured, its Passport strategy is skipped automatically.
 
 ---
 
@@ -786,74 +560,65 @@ If a provider is not configured, its Passport strategy is simply not registered.
 
 The project uses PostgreSQL through Prisma.
 
-After configuring `DATABASE_URL`, run:
+Generate the Prisma client:
 
 ```bash
-
-npx prisma migrate dev
-
+npm run db:generate
 ```
 
-Generate the Prisma client if necessary:
+Run migrations:
 
 ```bash
-
-npx prisma generate
-
+npm run db:migrate
 ```
 
-The database schema is located at:
+For production deployments, apply migrations using:
 
-```text
-
-prisma/schema.prisma
-
+```bash
+npm run db:migrate:deploy
 ```
-
-For production deployments, use Prisma migrations rather than manually modifying the production database schema.
 
 ---
 
 # Running the Application
 
-Start the development server:
+### Development Mode
+
+Start the development server with hot-reloading:
 
 ```bash
-
 npm run dev
-
 ```
 
-Start the application normally:
+The API will be available at `http://localhost:3000`.
+
+### Production Build & Run
+
+1. Compile TypeScript:
 
 ```bash
+npm run build
+```
 
+2. Start the production server:
+
+```bash
 npm start
-
 ```
 
-The API will be available at:
+### Health Check
 
-```text
-
-http://localhost:3000
-
-```
-
-The health endpoint can be used to verify that the API is running:
+Verify that the server is up and running:
 
 ```http
-
 GET /health
-
 ```
 
-Example response:
+Response:
 
 ```json
 {
   "success": true,
-
   "message": "API is running."
 }
 ```
@@ -864,72 +629,46 @@ Example response:
 
 The project includes integration and unit tests using Vitest and Supertest.
 
-Tests use a separate environment file:
-
-```text
-
-.env.test
-
-```
-
-Make sure the test database is configured before running the test suite.
+Tests use a dedicated `.env.test` environment file.
 
 Run all tests:
 
 ```bash
-
 npm test
-
 ```
 
 Run a specific test file:
 
 ```bash
-
 npm test -- tests/auth/login.test.js
-
 ```
-
-The test suite covers authentication, sessions, OAuth profile processing, email verification, password reset, account management, validation, rate limiting, and other authentication behavior.
 
 ---
 
 # Code Quality
 
+Run type checking:
+
+```bash
+npm run typecheck
+```
+
 Run ESLint:
 
 ```bash
-
 npm run lint
-
 ```
 
-Format the project:
+Format code:
 
 ```bash
-
 npm run format
-
 ```
 
-Check formatting without modifying files:
+Run full validation:
 
 ```bash
-
-npm run format:check
-
-```
-
-Before opening a pull request or using the template as the foundation for another project, it is recommended to run:
-
-```bash
-
-npm test
-
-npm run lint
-
-npm run format:check
-
+npm run check
 ```
 
 ---
@@ -939,60 +678,42 @@ npm run format:check
 All authentication and account-management endpoints are grouped into two primary route namespaces:
 
 ```text
-
 /auth
-
 /users
-
 ```
 
-Authentication state is primarily maintained through secure HTTP-only cookies.
+Authentication state is maintained through secure HTTP-only cookies.
 
 ---
 
-## Authentication
+## Authentication Endpoints
 
 ### `POST /auth/register`
 
-Creates a new local user account.
+Creates a new user account.
 
 #### Request
 
 ```json
 {
   "username": "johndoe",
-
   "email": "john@example.com",
-
   "password": "StrongPassword123!"
 }
 ```
-
-Registration behavior depends on the EMAIL_ENABLED configuration.
-
-When email functionality is enabled, registration creates an unverified account and sends an email verification message.
-
-When email functionality is disabled, the account is automatically marked as verified and no verification email or verification token is created.
 
 #### Response
 
 ```json
 {
   "success": true,
-
   "message": "Registration successful. Please verify your email address.",
-
   "user": {
     "id": "...",
-
     "username": "johndoe",
-
     "email": "john@example.com",
-
     "displayName": null,
-
     "avatarUrl": null,
-
     "emailVerifiedAt": null
   }
 }
@@ -1000,95 +721,55 @@ When email functionality is disabled, the account is automatically marked as ver
 
 ---
 
-## `POST /auth/login`
+### `POST /auth/login`
 
-Authenticates a verified local user.
+Authenticates a verified user. Sets `accessToken` and `refreshToken` HTTP-only cookies.
+
+#### Request
 
 ```json
 {
   "email": "john@example.com",
-
   "password": "StrongPassword123!"
 }
 ```
 
-Successful authentication sets:
-
-- `accessToken`
-
-- `refreshToken`
-
-as HTTP-only cookies.
-
-Authentication tokens are not returned in the JSON response.
-
 ---
 
-## `POST /auth/logout`
+### `POST /auth/logout`
 
 Logs the current session out and clears authentication cookies.
 
-The endpoint is intentionally safe to call even when the refresh token is missing, invalid, or expired.
+---
+
+### `POST /auth/refresh`
+
+Rotates the current refresh token and issues a new access token via cookies.
 
 ---
 
-## `POST /auth/refresh`
+### `GET /auth/me`
 
-Rotates the current refresh token and issues a new access token.
-
-The refresh token must be supplied through the authentication cookie.
+Returns the currently authenticated user profile. Requires authentication.
 
 ---
 
-## `GET /auth/me`
+### `POST /auth/email/verify`
 
-Returns the currently authenticated user.
-
-Requires authentication.
-
----
-
-# Email Verification
-
-## `POST /auth/email/verify`
-
-Verifies a user's email address.
+Verifies a user's email address using a 6-digit verification code.
 
 ```json
 {
   "email": "john@example.com",
-
   "code": "123456"
 }
 ```
 
-Verification codes are:
-
-- Cryptographically generated
-
-- Hashed before database storage
-
-- Short-lived
-
-- Single-use
-
-- Protected by resend cooldowns
-
 ---
 
-## `POST /auth/email/resend`
+### `POST /auth/email/resend`
 
-Requests another verification email.
-
-The endpoint intentionally returns a generic success response so that it does not unnecessarily reveal whether a specific email belongs to an account.
-
----
-
-# Password Reset
-
-## `POST /auth/password/forgot`
-
-Requests a password reset email.
+Requests a new verification email code.
 
 ```json
 {
@@ -1096,77 +777,66 @@ Requests a password reset email.
 }
 ```
 
-The endpoint intentionally uses a generic response regardless of whether the account exists.
+---
 
-If email functionality is disabled, the endpoint returns:
+### `POST /auth/password/forgot`
 
+Requests a password reset link.
+
+```json
 {
-"success": false,
-"error": {
-"code": "EMAIL_FEATURE_DISABLED",
-"message": "Password reset is unavailable because email functionality is disabled."
+  "email": "john@example.com"
 }
-}
+```
 
 ---
 
-## `POST /auth/password/reset`
+### `POST /auth/password/reset`
 
-Resets a password using a valid reset token.
+Resets a user's password using a valid reset token. Invalids all active user sessions.
 
 ```json
 {
   "token": "reset-token",
-
   "newPassword": "NewStrongPassword123!"
 }
 ```
 
-Resetting a password also revokes the user's active sessions.
-
 ---
 
-# User Account Management
+## User Account Management
 
 All user-management endpoints require authentication.
 
----
+### `PATCH /users/me`
 
-## `PATCH /users/me`
-
-Updates the user's profile.
+Updates the authenticated user's display name or avatar URL.
 
 ```json
 {
   "displayName": "John Doe",
-
   "avatarUrl": "https://example.com/avatar.jpg"
 }
 ```
 
-At least one profile field must be supplied.
-
 ---
 
-## `PATCH /users/me/password`
+### `PATCH /users/me/password`
 
-Changes the authenticated user's password.
+Changes the user's password and revokes all active sessions.
 
 ```json
 {
   "currentPassword": "CurrentPassword123!",
-
   "newPassword": "NewPassword123!"
 }
 ```
 
-Changing the password revokes all active sessions.
-
 ---
 
-## `PATCH /users/me/username`
+### `PATCH /users/me/username`
 
-Changes the username.
+Updates the username.
 
 ```json
 {
@@ -1176,9 +846,9 @@ Changes the username.
 
 ---
 
-## `PATCH /users/me/email`
+### `PATCH /users/me/email`
 
-Requests an email address change.
+Requests an email address change. Sends a confirmation link to the new address.
 
 ```json
 {
@@ -1186,23 +856,11 @@ Requests an email address change.
 }
 ```
 
-The new address must be confirmed through the verification email before the account's email address is changed.
-
-If email functionality is disabled, this endpoint returns:
-
-{
-"success": false,
-"error": {
-"code": "EMAIL_FEATURE_DISABLED",
-"message": "Email change is unavailable because email functionality is disabled."
-}
-}
-
 ---
 
-## `POST /users/me/email/confirm`
+### `POST /users/me/email/confirm`
 
-Confirms an email address change.
+Confirms an email address change with the token sent to the new email.
 
 ```json
 {
@@ -1212,11 +870,9 @@ Confirms an email address change.
 
 ---
 
-## `DELETE /users/me`
+### `DELETE /users/me`
 
-Deletes the authenticated user's account.
-
-Local-password accounts must provide the current password.
+Permanently deletes the authenticated user's account and clears cookies.
 
 ```json
 {
@@ -1224,694 +880,46 @@ Local-password accounts must provide the current password.
 }
 ```
 
-OAuth-only accounts do not have a local password and therefore do not require password confirmation.
-
 ---
 
-# OAuth Endpoints
+## OAuth Endpoints
 
-## Google
+### Google OAuth
 
-Start authentication:
+- `GET /auth/google`: Initiates Google authentication
+- `GET /auth/google/authorize`: Starts provider authorization with state cookie verification
+- `GET /auth/google/callback`: Handles Google callback and sets authentication cookies
 
-```http
+### GitHub OAuth
 
-GET /auth/google
-
-```
-
-Google authorization:
-
-```http
-
-GET /auth/google/authorize
-
-```
-
-Google callback:
-
-```http
-
-GET /auth/google/callback
-
-```
-
-## GitHub
-
-Start authentication:
-
-```http
-
-GET /auth/github
-
-```
-
-GitHub authorization:
-
-```http
-
-GET /auth/github/authorize
-
-```
-
-GitHub callback:
-
-```http
-
-GET /auth/github/callback
-
-```
-
-OAuth authentication uses a cryptographically random state value stored in an HTTP-only cookie and validated during the callback.
-
----
-
-# Error Handling
-
-The API uses a consistent error response structure.
-
-Example:
-
-```json
-{
-  "success": false,
-
-  "error": {
-    "code": "EMAIL_ALREADY_EXISTS",
-
-    "message": "Email is already registered."
-  }
-}
-```
-
-Validation errors additionally include field-level details:
-
-```json
-{
-  "success": false,
-
-  "error": {
-    "code": "VALIDATION_ERROR",
-
-    "message": "Request validation failed.",
-
-    "details": [
-      {
-        "field": "password",
-
-        "message": "Password must be at least 8 characters long."
-      }
-    ]
-  }
-}
-```
-
-Application-specific errors use `AppError`.
-
-Database errors that represent expected conditions, such as unique-constraint violations, are translated into appropriate API responses by the centralized error handler.
-
-Unexpected errors are intentionally exposed as a generic:
-
-```json
-{
-  "success": false,
-
-  "error": {
-    "code": "INTERNAL_ERROR",
-
-    "message": "An unexpected error occurred."
-  }
-}
-```
-
----
-
-# Validation
-
-Request bodies are validated using Zod before reaching controllers.
-
-The validation flow is:
-
-```text
-
-Request
-
-   │
-
-   ▼
-
-Zod Schema
-
-   │
-
-   ├── Invalid → 400 Validation Error
-
-   │
-
-   └── Valid
-
-        │
-
-        ▼
-
-    req.body
-
-        │
-
-        ▼
-
-    Controller
-
-```
-
-Validation schemas are kept separate from business logic.
-
-Common validation rules are shared through:
-
-```text
-
-src/schemas/common.schema.js
-
-```
-
-This prevents rules such as password requirements from being duplicated across authentication endpoints.
+- `GET /auth/github`: Initiates GitHub authentication
+- `GET /auth/github/authorize`: Starts provider authorization with state cookie verification
+- `GET /auth/github/callback`: Handles GitHub callback and sets authentication cookies
 
 ---
 
 # Rate Limiting
 
-Authentication-sensitive endpoints use dedicated rate limiters.
-
-Current protected operations include:
-
-| Operation                 |     Window | Limit |
-
+| Operation                 |     Window | Limit |
 | ------------------------- | ---------: | ----: |
-
-| Login                     | 15 minutes |    10 |
-
-| Registration              |     1 hour |     5 |
-
-| Refresh                   | 15 minutes |    20 |
-
-| Email verification        | 15 minutes |    10 |
-
-| Verification email resend |     1 hour |     5 |
-
-| Password reset request    | 15 minutes |     5 |
-
-| Password reset            | 15 minutes |     5 |
-
-These limits are intended as sensible defaults for the template and should be reviewed according to the requirements and threat model of the application where the template is deployed.
-
----
-
-# Security Model
-
-This template is designed with several security boundaries in mind.
-
-## Passwords
-
-Passwords are never stored in plaintext.
-
-They are hashed using `bcryptjs` before being persisted.
-
-```text
-
-Plaintext password
-
-       │
-
-       ▼
-
-    bcrypt
-
-       │
-
-       ▼
-
-Password hash
-
-       │
-
-       ▼
-
-   PostgreSQL
-
-```
-
----
-
-## Refresh Tokens
-
-Raw refresh tokens are not stored in the database.
-
-Instead:
-
-```text
-
-Refresh Token
-
-      │
-
-      ▼
-
-   SHA-256
-
-      │
-
-      ▼
-
-Token Hash
-
-      │
-
-      ▼
-
- PostgreSQL
-
-```
-
-This means database access alone does not expose usable refresh credentials.
-
----
-
-## Token Rotation
-
-Every successful refresh operation replaces the stored refresh-token hash.
-
-A previously used refresh token therefore cannot be used again.
-
-If token reuse is detected, the associated session is revoked.
-
----
-
-## Session Revocation
-
-Sessions can be revoked individually or for an entire user.
-
-All active sessions are revoked when:
-
-- A user changes their password
-
-- A user resets their password
-
-- A refresh-token reuse attempt is detected
-
-This provides server-side invalidation even though authentication uses JWTs.
-
----
-
-## Cookies
-
-Authentication cookies are configured with:
-
-- `httpOnly`
-
-- `sameSite`
-
-- `secure` in production
-
-- Restricted paths
-
-- Explicit expiration
-
-The access token and refresh token use separate cookie configurations.
-
----
-
-## OAuth State Protection
-
-OAuth flows generate a cryptographically random state value.
-
-The callback verifies the received state using a timing-safe comparison before accepting the authentication result.
-
-This helps protect the OAuth callback from forged or unsolicited authorization responses.
-
----
-
-## Email Security
-
-Verification and reset credentials are not stored in plaintext.
-
-The system uses:
-
-- Cryptographically secure random values
-
-- SHA-256 hashes
-
-- Expiration times
-
-- Single-use tokens
-
-- Request cooldowns
-
-Password-reset and email-change flows also invalidate previously active tokens where appropriate.
-
----
-
-# CORS
-
-The API allows credentialed cross-origin requests only from the configured frontend origin:
-
-```env
-
-CLIENT_URL="http://localhost:5173"
-
-```
-
-The frontend must therefore be explicitly configured as the allowed origin.
-
-For production deployments, `CLIENT_URL` should point to the actual frontend origin rather than using a wildcard.
-
----
-
-# Email Delivery
-
-Email delivery is implemented through Resend.
-
-The email service is intentionally isolated behind:
-
-```text
-
-src/services/email.service.js
-
-```
-
-Application services do not need to know how email is delivered.
-
-They simply call:
-
-```js
-await sendEmail({
-  to,
-
-  subject,
-
-  html,
-});
-```
-
-This keeps email infrastructure replaceable if a future application needs a different provider.
-
----
-
-# Extending the Template
-
-The authentication layer is intended to remain independent from application-specific functionality.
-
-For example, if this template is used for a social application, application-specific functionality could be organized separately:
-
-```text
-
-src/
-
-├── controllers/
-
-│   ├── auth.controller.js
-
-│   ├── oauth.controller.js
-
-│   ├── user.controller.js
-
-│   ├── post.controller.js
-
-│   └── comment.controller.js
-
-│
-
-├── routes/
-
-│   ├── auth.routes.js
-
-│   ├── user.routes.js
-
-│   ├── post.routes.js
-
-│   └── comment.routes.js
-
-│
-
-└── services/
-
-    ├── auth.service.js
-
-    ├── user.service.js
-
-    ├── session.service.js
-
-    ├── post.service.js
-
-    └── comment.service.js
-
-```
-
-The authentication system should not need to know what the application does with authenticated users.
-
-Instead, application-specific routes can simply use:
-
-```js
-authenticate;
-```
-
-to establish the authenticated user context.
-
----
-
-# Customizing the Template
-
-When starting a new project from this repository, the recommended process is:
-
-### 1. Clone the template
-
-```bash
-
-git clone https://github.com/JavedanCode/express-auth-api-template.git my-new-project
-
-```
-
-### 2. Create a new repository
-
-Create a new Git repository for the actual application rather than continuing development directly on the template repository.
-
-### 3. Configure the environment
-
-Create `.env` from `.env.example`.
-
-### 4. Configure PostgreSQL
-
-Create a project-specific database and update `DATABASE_URL`.
-
-### 5. Configure the frontend
-
-Set:
-
-```env
-
-CLIENT_URL="..."
-
-```
-
-### 6. Configure email
-
-Decide whether the application requires email functionality.
-
-If email is not required, leave:
-
-EMAIL_ENABLED=false
-
-If email functionality is required, set:
-
-EMAIL_ENABLED=true
-
-and configure the Resend API key, sender address, and email URLs.
-
-### 7. Configure OAuth if required
-
-Add Google and/or GitHub credentials if the application needs social authentication.
-
-### 8. Update the Prisma schema
-
-Add application-specific models while preserving the authentication models and relationships required by the application.
-
-### 9. Add application-specific routes and services
-
-Keep new business logic separate from the authentication infrastructure.
-
----
-
-# Production Considerations
-
-This template provides the application-level foundation for production-oriented authentication, but deploying a real application still requires environment and infrastructure configuration appropriate for the deployment.
-
-Before deploying:
-
-- Use HTTPS/TLS
-
-- Set `NODE_ENV=production`
-
-- Use strong, unique JWT secrets
-
-- Never commit `.env`
-
-- Use production PostgreSQL credentials
-
-- Configure the correct frontend origin
-
-- Configure OAuth callback URLs for the production domain
-
-- Configure a production email sender if email functionality is enabled
-
-- Review rate limits for the application's traffic and threat model
-
-- Keep Node.js and dependencies up to date
-
-- Run database migrations as part of the deployment process
-
-- Use appropriate process management and infrastructure for the hosting environment
-
-- Monitor application errors and authentication activity
-
-- Review the application's CORS, cookie, and proxy configuration
-
-The template is deliberately not tied to a specific hosting provider.
-
----
-
-# Development Philosophy
-
-This project follows a few principles:
-
-### Keep authentication infrastructure reusable
-
-Authentication should not depend on whether the application is a blog, social network, messaging application, dashboard, marketplace, or something else.
-
-### Prefer clear service boundaries
-
-Controllers handle HTTP.
-
-Services handle business logic.
-
-Prisma handles persistence.
-
-Middleware handles cross-cutting request concerns.
-
-### Validate at the boundary
-
-Incoming data is validated before it reaches application logic.
-
-### Let the database enforce integrity
-
-Application-level checks provide useful errors, but database constraints remain the final authority for uniqueness and relational integrity.
-
-### Keep security decisions explicit
-
-Authentication behavior that is security-sensitive should be easy to locate and understand.
-
-### Avoid unnecessary abstraction
-
-The template is modular, but it intentionally avoids introducing abstractions that do not provide meaningful value.
-
----
-
-# Contributing
-
-Contributions are welcome.
-
-If you find a bug, security issue, documentation problem, or improvement that would make the template more useful to other developers, feel free to open an issue or submit a pull request.
-
-When contributing:
-
-1. Keep changes focused.
-
-2. Preserve the existing architecture unless there is a strong reason to change it.
-
-3. Add or update tests for behavioral changes.
-
-4. Run the test suite.
-
-5. Run ESLint.
-
-6. Run the formatter.
-
-7. Avoid introducing application-specific functionality into the authentication core.
-
-8. Document security-sensitive architectural changes.
-
-For significant architectural changes, open an issue first so the proposed approach can be discussed before implementation.
-
----
-
-# Security Issues
-
-Please do not publicly disclose a potentially exploitable security vulnerability in an issue before giving the maintainer an opportunity to investigate it.
-
-For serious security issues, contact the repository maintainer privately through the contact information available on the maintainer's GitHub profile.
+| Login                     | 15 minutes |    10 |
+| Registration              |     1 hour |     5 |
+| Refresh                   | 15 minutes |    20 |
+| Email verification        | 15 minutes |    10 |
+| Verification email resend |     1 hour |     5 |
+| Password reset request    | 15 minutes |     5 |
+| Password reset            | 15 minutes |     5 |
 
 ---
 
 # License
 
-This project is licensed under the **MIT License**.
-
-You are free to:
-
-- Use the template in personal projects
-
-- Use the template in commercial projects
-
-- Modify the source code
-
-- Distribute modified versions
-
-- Build proprietary applications using the template
-
-See the `LICENSE` file for the complete license text.
-
----
-
-# Acknowledgements
-
-This project is built on the following open-source technologies:
-
-- Express
-
-- Prisma
-
-- PostgreSQL
-
-- Passport
-
-- JSON Web Tokens
-
-- Zod
-
-- bcryptjs
-
-- Helmet
-
-- express-rate-limit
-
-- Resend
-
-- Vitest
-
-- Supertest
-
----
-
-# Project Status
-
-This repository is intended to serve as a **reusable authentication API foundation** rather than a finished end-user application.
-
-The authentication and user-management functionality is implemented and covered by automated tests. The template can be extended with application-specific functionality as required.
+This project is licensed under the **MIT License**. See the `LICENSE` file for details.
 
 ---
 
 ## Author
 
-**JavedanCode**
+**[Mukund Kumar](https://github.com/mukundsingh19)**
 
-Built as a reusable foundation for future full-stack applications and client projects.
-
-If you find the project useful, feel free to fork it, adapt it, and build something great with it.
+Built as a reusable, type-safe foundation for future full-stack applications and client projects.
